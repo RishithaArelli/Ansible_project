@@ -1,0 +1,32 @@
+---
+- name: Configure web servers
+  hosts: webservers
+  become: yes
+
+  tasks:
+
+    - name: Install nginx
+      package:
+        name: nginx
+        state: present
+        update_cache: yes
+
+    - name: Ensure nginx is running
+      systemd:
+        name: nginx
+        state: started
+        enabled: yes
+  
+    - name: Deploy application page
+      template:
+        src: ../templates/index.html.j2
+        dest: /usr/share/nginx/html/index.html
+        owner: root
+        group: root
+        mode: '0644'
+  handlers:
+
+    - name: Restart nginx
+      systemd:
+        name: nginx
+        state: restarted
